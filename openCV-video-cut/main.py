@@ -8,34 +8,24 @@ import time
 import sys
 
 keyFrameFile = open('savedKeyFrame.txt', 'w') 
- 
-color = np.random.randint(0,255,(12,3)) ##
-color[0]=[0,0,255] ##
-color[1]=[0,255,0] ##
-color[2]=[255,0,0] ##
-color[3]=[0,255,255] ##
-color[4]=[255,0,255] ##
-color[5]=[255,255,0] ##
-color[6]=[0,127,255] ##
-color[7]=[0,255,127] ##
-color[8]=[127,0,255] ##
-color[9]=[255,0,127] ##
-color[10]=[127,255,0] ##
-color[11]=[255,127,0] ##
-legendTEXT=[] ##
-for i in range(1,13): ##
-    legendTEXT.append("point %d"%i) ##
- 
+cap = [] # list to store frames
+drawing = False # true if mouse is pressed
+img = None
+ix,iy = -1,-1
+
+
 def readvid(namevid):
     #objective:get frames from video
     #input:path of video
     #output:frames of video,frames per second,width of video,height of video
+    global cap
+
     vid = cv2.VideoCapture(namevid)
     num_f = int(vid.get(cv2.CAP_PROP_FRAME_COUNT)) #Number of frames
     width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(vid.get(cv2.CAP_PROP_FPS))
-    obj = []
+
     t=time.time() ###
     print ""  ###
     sys.stdout.write("reading video ... 0%") ###
@@ -43,7 +33,7 @@ def readvid(namevid):
         ret, frame = vid.read()
         if ret == False:
             break
-        obj.append(frame)
+        cap.append(frame)
 
         #show %
         if time.time()-t>1: ###
@@ -56,41 +46,43 @@ def readvid(namevid):
     print "" ###
     time.sleep(1) ###
     vid.release()
-    return obj, fps, width, height
- 
+    return fps, width, height
+
 def draw_rectangle(event,x,y,flags,param):
-    global ix,iy,drawing
+    global ix,iy, drawing, cap, img
 
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
         ix,iy = x,y
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing == True:
-            draw_frame = img.copy()
-            cv2.rectangle(draw_frame,(ix,iy),(x,y),(0,255,0))
+            i = cv2.getTrackbarPos('frame','Choose frame')
+            img = cap[i].copy()
+            cv2.rectangle(img,(ix,iy),(x,y),(0,255,0))
+            # cv2.imshow('Choose frame',img)
        
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
-        cv2.rectangle(img,(ix,iy),(x,y),(0,255,0))
 
-def chooseframe(obj,fps,height):
+def chooseframe(fps,height):
     #objective:GUI letting user choose frame
     #input:frames of video,frames per second of video, indices of keyframes,height of video,bool true:show legend//false:don't show legend
     #output:frame chosen
-    global legendTEXT ##
-    def nothing(x):
-        #not important
-        pass
+    global cap, img
+
+    def onChange(trackbarValue):
+        global cap, img
+        img = cap[trackbarValue].copy()
              
     #initilization
-    n=len(obj)
-    img = np.copy(obj[0])
+    n=len(cap)
     cv2.namedWindow('Choose frame',cv2.WND_PROP_FULLSCREEN)
     cv2.moveWindow('Choose frame',20,20)
     cv2.resizeWindow('Choose frame', 600,600)
-    cv2.setMouseCallback('Choose frame', click_and_drag)
+    cv2.setMouseCallback('Choose frame', draw_rectangle)
  
-    cv2.createTrackbar('frame','Choose frame',0,len(obj)-1,nothing)
+    cv2.createTrackbar('frame','Choose frame',0,n-1,onChange)
+    onChange(0)
      
     font = cv2.FONT_HERSHEY_COMPLEX
 
@@ -102,14 +94,14 @@ def chooseframe(obj,fps,height):
     while(1):
         cv2.imshow('Choose frame',img)
         k = cv2.waitKey(1) & 0xFF
-        if k == 13:
+        if k == 27:
             break
         if k == ord('p'):
             while i<n:
                 k = cv2.waitKey(1000/fps) & 0xFF
                 if k == ord('p'):
                     break
-                img=np.copy(obj[i])
+                img=np.copy(cap[i])
                 cv2.putText(img,"Press on 'p' to Play/Pause",(5,12), font, 0.45,(255,255,255),1,cv2.LINE_4)
                 cv2.imshow('Choose frame',img)
                 i=i+1
@@ -125,19 +117,18 @@ def chooseframe(obj,fps,height):
                 typeFrame = "Start keyFrame"
                 keyFrameFile.write(str(i) + '\n')
 
-        img=np.copy(obj[i])
         cv2.putText(img,"Press 's' to save " + typeFrame,(5,25), font, 0.45,(255,255,255),1,cv2.LINE_4)
         cv2.putText(img,"Press on 'p' to Play/Pause",(5,12), font, 0.45,(255,255,255),1,cv2.LINE_4)
-        cv2.putText(img,"Press Enter to exit",(5,height-7), font, 0.45,(255,255,255),1,cv2.LINE_4)
+        cv2.putText(img,"Press Esc to exit",(5,height-7), font, 0.45,(255,255,255),1,cv2.LINE_4)
      
     cv2.destroyAllWindows()
     return i
  
 #run everything
 def runMotionTrack(filename):
-    obj,fps,width,height=readvid(filename)
-    n=len(obj)
+    fps,width,height=readvid(filename)
+    n=len(cap)
     if n>0:
-        i=chooseframe(obj,fps,height)
+        i=chooseframe(fps,height)
 
-runMotionTrack("out.mp4")
+runMotionTrack("input.mp4")

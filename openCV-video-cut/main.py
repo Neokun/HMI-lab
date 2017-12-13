@@ -7,11 +7,12 @@ import numpy as np
 import time
 import sys
 
-keyFrameFile = open('savedKeyFrame.txt', 'w') 
+frameFile = open('savedFrame.txt', 'w') 
 cap = [] # list to store frames
 drawing = False # true if mouse is pressed
-img = None
-ix,iy = -1,-1
+img = None #current frame
+x0,y0 = -1,-1 #current top-left of the rectangle
+x1,y1 = -1,-1 #current bot-right of the rectangle
 
 
 def readvid(namevid):
@@ -49,26 +50,29 @@ def readvid(namevid):
     return fps, width, height
 
 def draw_rectangle(event,x,y,flags,param):
-    global ix,iy, drawing, cap, img
+    #objectice: function to draw a reactangle by mouse
+    #input: mouse event, mouse position
+    #output: frame was drawed
+    global x0, y0, x1, y1, drawing, cap, img
 
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
-        ix,iy = x,y
+        x0,y0 = x,y
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing == True:
             i = cv2.getTrackbarPos('frame','Choose frame')
             img = cap[i].copy()
-            cv2.rectangle(img,(ix,iy),(x,y),(0,255,0))
-            # cv2.imshow('Choose frame',img)
+            cv2.rectangle(img,(x0,y0),(x,y),(0,255,0))
+            x1,y1 = x,y
        
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
 
 def chooseframe(fps,height):
     #objective:GUI letting user choose frame
-    #input:frames of video,frames per second of video, indices of keyframes,height of video,bool true:show legend//false:don't show legend
-    #output:frame chosen
-    global cap, img
+    #input:frames of video,frames per second of video, height of video
+    #output:save frame chosen and rectangle chosen
+    global cap, img, x0, y0, x1, y1
 
     def onChange(trackbarValue):
         global cap, img
@@ -85,9 +89,6 @@ def chooseframe(fps,height):
     onChange(0)
      
     font = cv2.FONT_HERSHEY_COMPLEX
-
-    #type of current keyFrame to save (start frame or end frame)
-    typeFrame = "Start keyFrame"
 
     i=0   
     #run process
@@ -110,14 +111,10 @@ def chooseframe(fps,height):
         # get current positions of four trackbars
         i = cv2.getTrackbarPos('frame','Choose frame')
         if k == ord('s'):
-            if typeFrame == "Start keyFrame":
-                typeFrame = "End keyFrame"
-                keyFrameFile.write(str(i) + ' ')
-            else:
-                typeFrame = "Start keyFrame"
-                keyFrameFile.write(str(i) + '\n')
+            frameFile.write('{},{},{},{},{}\n'.format(i,x0,y0,x1,y1))
+            print('saved frame {}, rectangle:{},{},{},{}'.format(i,x0,y0,x1,y1))
 
-        cv2.putText(img,"Press 's' to save " + typeFrame,(5,25), font, 0.45,(255,255,255),1,cv2.LINE_4)
+        cv2.putText(img,"Press 's' to save frame and rectangle",(5,25), font, 0.45,(255,255,255),1,cv2.LINE_4)
         cv2.putText(img,"Press on 'p' to Play/Pause",(5,12), font, 0.45,(255,255,255),1,cv2.LINE_4)
         cv2.putText(img,"Press Esc to exit",(5,height-7), font, 0.45,(255,255,255),1,cv2.LINE_4)
      

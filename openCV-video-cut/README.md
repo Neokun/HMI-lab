@@ -1,4 +1,4 @@
-#cut frame and draw rectangle from video .mp4
+# cut frame and draw rectangle from video .mp4
 	to run code: python main.py
 	
 	frame is saved in savedFrame.txt with format:

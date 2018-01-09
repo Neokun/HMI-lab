@@ -7,7 +7,7 @@ import numpy as np
 import time
 import sys
 
-frameFile = open('savedFrame.txt', 'r')
+
 cap = []            # list to store frames
 idKFrames = []      # list of index of key frame which is stored in savedFrame.txt
 
@@ -45,7 +45,12 @@ def readvid(namevid):
     vid.release()
     return fps, width, height
 
-def readFramefile(filename):
+def readFramefile(filename):    
+    #Objective: read file savedFrame.txt and get the first number of each line as the index of key frame in video
+    #Input: savedFrame.txt
+    #Output: list of key frame's index
+
+    frameFile = open(filename, 'r')
     for line in frameFile:
         a = ""
         for i in range(len(line)):
@@ -55,18 +60,18 @@ def readFramefile(filename):
         idKFrames.append(int(a))
 
     sys.stdout.write("List key frames: " + str(idKFrames))
-    return 1
+    return idKFrames
 
-def chooseframe():
-    #objective:GUI letting user choose frame
-    #input:frames of video,frames per second of video, height of video
-    #output:save frame chosen and rectangle chosen
+def printframe():
+    #objective: save key frame as image into key-frames folder
+    #input: list frame of video AND list key frame's index
+    #output: save key frame into key-frames folder with name is frame's index added zero prefix and format is .jpg
     n = len(idKFrames)
     for i in range(n):
         img = cap[idKFrames[i]]
         sys.stdout.write('\n' + "save key frame: %d" %idKFrames[i])
         strname = str(idKFrames[i])
-        addzero = 4 - len(strname)
+        addzero = len(str(idKFrames[n-1])) - len(strname)
         for j in range(addzero):
             strname = "0" + strname
         cv2.imwrite("key-frames/" + strname + ".jpg", img)
@@ -80,8 +85,7 @@ def chooseframe():
 def runMotionTrack(vidName, KFFName):   #KFFName stands for key frames file name.
     fps, width, height = readvid(vidName)
     readFramefile(KFFName)
-    chooseframe()
+    printframe()
     
-
 
 runMotionTrack("input.mp4", "savedFrame.txt")

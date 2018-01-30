@@ -1,2 +1,7 @@
-# DeepPose-part-2
-# Lab HMI project
+# Pose-editing-toolkit
+
+[Report](https://github.com/Neokun/HMI-lab/blob/master/Pose-editing-toolkit/Report.docx)
+
+# Run
+
+python application.py

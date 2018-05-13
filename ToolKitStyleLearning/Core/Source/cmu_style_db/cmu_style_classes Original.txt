@@ -1,0 +1,22 @@
+142_01	Childish
+142_02	Clumsy
+142_03	Clumsy
+142_04	Cool
+142_05	Depressed
+142_06	Elated
+142_07	Elderlyman
+142_08	Happy
+142_09	Joy
+142_10	Lavish
+142_11	Marching
+142_12	Painfulleftknee
+142_13	Relaxed
+142_14	Rushed
+142_15	Sad
+142_16	Scared
+142_17	Scared
+142_18	Sexy
+142_19	Shy
+142_20	Singing in the rain jump
+142_21	Singing in the rain jump
+142_22	Sneaky

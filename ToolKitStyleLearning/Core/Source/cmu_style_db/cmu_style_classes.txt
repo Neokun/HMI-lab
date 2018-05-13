@@ -1,0 +1,22 @@
+filename_no| class| description| Skip frame no.
+
+2 [0] Clumsy ( Ok Hau dau): Skip 200 
+3 [0] Clumsy ( Ok ): Skip 1000
+#4 2 Cool (Not clear, kind of confidence)
+5 [1] Depressed ( Ok Chan nan): skip 200
+6 [2] Elated ( Ok Phan khoi): Skip 260 ->2500
+7 [3] Elderly ( Ok ): Skip 150
+#8 6 Happy (Not clear, kind of neutral)
+9 [4] Joy ( Ok Stronger than happiness): Skip 200 ->2300
+11 [5] Marching ( Ok Military manner): Skip 300
+12 [6] Painfulleftknee ( Ok): Skip 250
+#13 11 Relaxed (Not clear: should be neutral)
+14 [7] Rushed ( Ok Voi vang): Skip 200
+15 [8] Sad (Ok): Skip 250
+16 [9] Scared ( Ok): Skip 250
+17 [9] Scared ( Ok): Skip 350
+18 [10] Sexy ( Ok, kind of confuse with lavish): Skip 200
+19 [11] Shy ( Ok Kind of not clear): Skip 250
+22 [12] Sneaky ( Len lut): Skip 250
+
+#Emotion at the beginning, the turns and the end are not neutral.
